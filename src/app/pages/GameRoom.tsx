@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import { PlayingCard, type Suit, type CardValue } from "../components/PlayingCard";
 import { Button } from "../components/Button";
 import { motion, AnimatePresence } from "motion/react";
-import { Clock, History, Trophy, X } from "lucide-react";
+import { AlertTriangle, ChevronDown, Clock, Coins, History, RefreshCw, Shield, Trophy, X } from "lucide-react";
 import {
   VictoryModal,
   DefeatModal,
@@ -44,6 +44,7 @@ export function GameRoom() {
   const [isStartingMatchmaking, setIsStartingMatchmaking] = useState(false);
   const [rematchWaiting, setRematchWaiting] = useState(false);
   const [modalActionError, setModalActionError] = useState<string | null>(null);
+  const [isMobileHistoryOpen, setIsMobileHistoryOpen] = useState(false);
 
   const applyServerState = async (nextGame: GameFull, nextResult: GameResultPayload | null) => {
     setGame(nextGame);
@@ -174,7 +175,27 @@ export function GameRoom() {
   };
 
   const handleCardClick = (index: number) => {
-    if (canPlayCard(playerHand[index])) {
+    const card = playerHand[index];
+    if (!card) return;
+
+    if (!isMyTurn) {
+      setError("Ce n'est pas votre tour. Attendez le coup de l'adversaire.");
+      return;
+    }
+
+    if (!canPlayCard(card)) {
+      setError(
+        leadSuit
+          ? `Vous devez suivre la couleur demandee: ${getSuitLabel(leadSuit)}.`
+          : "Cette carte ne peut pas etre jouee maintenant.",
+      );
+      return;
+    }
+
+    setError(null);
+    if (selectedCard === index) {
+      setSelectedCard(null);
+    } else {
       setSelectedCard(index);
     }
   };
@@ -317,8 +338,17 @@ export function GameRoom() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-300">
-        Chargement de la partie...
+      <div className="min-h-screen bg-slate-950 px-4 py-6 text-slate-300">
+        <div className="mx-auto flex min-h-[80vh] max-w-4xl flex-col justify-center gap-6">
+          <div className="h-12 w-48 animate-pulse rounded-lg bg-slate-800" />
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="h-24 animate-pulse rounded-lg bg-slate-900" />
+            <div className="h-24 animate-pulse rounded-lg bg-slate-900" />
+            <div className="h-24 animate-pulse rounded-lg bg-slate-900" />
+          </div>
+          <div className="h-72 animate-pulse rounded-xl border border-slate-800 bg-slate-900/70" />
+          <div className="text-center text-sm text-slate-400">Chargement de la partie...</div>
+        </div>
       </div>
     );
   }
@@ -337,6 +367,9 @@ export function GameRoom() {
   const opponentCardsCount = game.opponent?.cardsLeft ?? 0;
   const pot = game.winType === "korat" ? 20 : 10;
   const myName = user?.username ?? "Vous";
+  const opponentName = game.opponent?.username ?? "En attente";
+  const opponentTricksWon = game.opponent?.tricksWon ?? 0;
+  const currentRoundLabel = Math.min(Math.max(game.currentRound, 1), 5);
   const modalAmount = game.winType === "korat" ? 20 : 10;
   const rematchLabel = rematchWaiting
     ? "En attente de l'adversaire..."
@@ -349,6 +382,17 @@ export function GameRoom() {
     : null;
   const rematchDisabled = isRequestingRematch || rematchWaiting || isStartingMatchmaking;
   const matchmakingDisabled = isRequestingRematch || isStartingMatchmaking;
+  const selectedPlayableCard = selectedCard !== null ? playerHand[selectedCard] : null;
+  const playableCardsCount = playerHand.filter((card) => canPlayCard(card)).length;
+  const turnState = getTurnState({
+    status: game.status,
+    isMyTurn,
+    leadSuit,
+    currentTrickCount: currentTrick.length,
+    selectedCard: selectedPlayableCard,
+    playableCardsCount,
+    opponentName: game.opponent?.username ?? "l'adversaire",
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-x-hidden">
@@ -379,84 +423,108 @@ export function GameRoom() {
       </div>
 
       <div className="relative z-10 min-h-screen flex flex-col">
-        <div className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="p-4">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <Button
               variant="secondary"
               size="sm"
               onClick={() => navigate("/dashboard")}
+              className="w-fit"
             >
               <X className="w-4 h-4 mr-2 inline" />
               Quitter
             </Button>
-            <div className="bg-slate-900/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-700">
-              <div className="text-sm text-slate-400">Gain</div>
-              <div className="text-xl font-bold text-amber-500">{pot} credits</div>
+
+            <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-4">
+              <StatusTile label="Gain potentiel" value={`${pot} credits`} tone="amber" />
+              <StatusTile label="Score" value={`${game.myTricksWon} - ${opponentTricksWon}`} tone="slate" />
+              <StatusTile label="Pli" value={`${currentRoundLabel}/5`} tone="emerald" />
+              <StatusTile label="Solde" value={`${user?.credits ?? 0} credits`} tone="slate" />
             </div>
+
             {isResyncing && (
-              <div className="bg-blue-500/10 text-blue-200 px-3 py-2 rounded-lg border border-blue-500/30 text-sm">
+              <div className="w-fit rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-sm text-blue-200">
                 resync
               </div>
             )}
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="bg-slate-900/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-700">
-              <div className="text-sm text-slate-400">Plis gagnes</div>
-              <div className="text-lg font-bold text-white">
-                {game.myTricksWon} - {game.opponent?.tricksWon ?? 0}
-              </div>
-            </div>
           </div>
         </div>
 
         <TrickHistoryPanel game={game} myName={myName} className="hidden xl:flex" />
 
         {error && (
-          <div className="mx-auto max-w-3xl rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-200">
-            {error}
-          </div>
+          <ErrorBanner
+            message={error}
+            onRetry={handleSync}
+            onDismiss={() => setError(null)}
+            onLobby={() => navigate("/lobby")}
+            isRetrying={isResyncing}
+          />
         )}
 
         <div className="px-4 pt-4">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3 bg-slate-900/80 backdrop-blur px-4 py-3 rounded-lg border border-slate-700">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white font-bold">
-                  {(game.opponent?.username ?? "?").slice(0, 2).toUpperCase()}
-                </div>
-                <div>
-                  <div className="text-white font-semibold">{game.opponent?.username ?? "En attente"}</div>
-                  <div className="text-sm text-slate-400">{game.opponent?.credits ?? 0} credits</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur px-4 py-3 rounded-lg border border-slate-700">
-                <Clock className={`w-5 h-5 text-amber-500 ${isMyTurn ? "animate-pulse" : ""}`} />
-                <span className="text-white font-bold text-lg">
-                  {game.status === "waiting" ? "Attente" : isMyTurn ? "A vous" : "Adversaire"}
-                </span>
+              <PlayerSummary
+                name={opponentName}
+                credits={game.opponent?.credits ?? 0}
+                tricksWon={opponentTricksWon}
+                cardsLeft={opponentCardsCount}
+                tone="opponent"
+              />
+              <div className={`flex items-center gap-2 rounded-lg border px-4 py-3 backdrop-blur ${turnState.headerClass}`}>
+                <Clock className={`w-5 h-5 ${isMyTurn ? "animate-pulse" : ""}`} />
+                <span className="font-bold text-lg">{turnState.shortLabel}</span>
               </div>
             </div>
 
-            <div className="flex justify-center gap-2 min-h-32">
-              {Array.from({ length: opponentCardsCount }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <PlayingCard suit="spades" value={8} faceDown size="md" />
-                </motion.div>
-              ))}
+            <div className="flex min-h-32 justify-center gap-2 rounded-xl border border-slate-800 bg-slate-950/35 px-3 py-4">
+              {opponentCardsCount > 0 ? (
+                Array.from({ length: opponentCardsCount }).map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <PlayingCard suit="spades" value={8} faceDown size="md" backSkin="gold" />
+                  </motion.div>
+                ))
+              ) : (
+                <EmptyTableMessage
+                  title={game.status === "waiting" ? "Aucun adversaire" : "Plus de cartes adverses"}
+                  description={game.status === "waiting" ? "La table attend un second joueur." : "La manche touche a sa fin."}
+                />
+              )}
             </div>
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center">
-          <div className="relative">
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="relative w-full max-w-4xl">
             <div className="absolute inset-0 -m-32 bg-gradient-to-br from-green-900/30 to-green-800/30 rounded-full blur-3xl" />
 
-            <div className="relative z-10 min-h-[200px] flex items-center justify-center gap-4">
+            <div className={`relative z-20 mx-auto mb-5 max-w-2xl rounded-xl border px-5 py-4 text-center shadow-2xl backdrop-blur ${turnState.panelClass}`}>
+              <div className="text-xs font-bold uppercase tracking-[0.22em] opacity-80">Tour en cours</div>
+              <div className="mt-1 text-2xl font-black text-white">{turnState.title}</div>
+              <div className="mt-1 text-sm text-slate-200">{turnState.description}</div>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                {leadSuit ? (
+                  <SuitDemandBadge suit={leadSuit} />
+                ) : (
+                  <span className="rounded-full border border-slate-600 bg-slate-950/70 px-3 py-1 text-xs font-semibold text-slate-300">
+                    Aucune couleur demandee
+                  </span>
+                )}
+                {isMyTurn && (
+                  <span className="rounded-full border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+                    {playableCardsCount} carte{playableCardsCount > 1 ? "s" : ""} jouable{playableCardsCount > 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="relative z-10 flex min-h-[220px] items-center justify-center gap-4 rounded-2xl border border-emerald-900/50 bg-gradient-to-br from-emerald-950/45 via-slate-950/60 to-slate-950/80 px-4 py-8 shadow-2xl shadow-black/30">
               <AnimatePresence>
                 {currentTrick.map((card, i) => (
                   <motion.div
@@ -470,60 +538,67 @@ export function GameRoom() {
                 ))}
               </AnimatePresence>
               {currentTrick.length === 0 && (
-                <div className="text-slate-400">
-                  {game.status === "waiting" ? "En attente d'un adversaire" : "Aucune carte jouee dans ce pli"}
-                </div>
+                <EmptyTableMessage
+                  title={game.status === "waiting" ? "En attente d'un adversaire" : "Le pli est vide"}
+                  description={game.status === "waiting" ? "La partie demarrera automatiquement." : "La premiere carte fixera la couleur demandee."}
+                />
               )}
             </div>
 
             <div className="text-center mt-4">
-              <div className="bg-slate-900/80 backdrop-blur px-6 py-3 rounded-lg border border-slate-700 inline-block">
-                <div className="text-sm text-slate-400 mb-1">Couleur demandee</div>
-                <div className="text-2xl">
-                  {leadSuit ? <SuitSymbol suit={leadSuit} /> : <span className="text-slate-500">-</span>}
-                </div>
-              </div>
               {result?.roundWinner && (
-                <div className="mt-3 text-sm text-amber-300">
-                  Pli remporte par {result.roundWinner}
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-200">
+                  <Trophy className="h-4 w-4" />
+                  Pli remporte par {result.roundWinner === myName ? "vous" : result.roundWinner}
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="px-4 pb-4">
+        <div className="sticky bottom-0 z-30 border-t border-slate-800 bg-slate-950/92 px-4 pb-4 pt-3 backdrop-blur-xl sm:relative sm:border-t-0 sm:bg-transparent sm:pt-0 sm:backdrop-blur-none">
           <div className="max-w-4xl mx-auto">
-            <div className="flex justify-center gap-3 mb-4 min-h-36">
+            <div className="mb-4 flex min-h-36 justify-start gap-3 overflow-x-auto pb-2 sm:justify-center sm:overflow-visible sm:pb-0">
               {playerHand.map((card, i) => (
-                <div key={`${card.suit}-${card.value}-${i}`} onClick={() => handleCardClick(i)}>
+                <div
+                  key={`${card.suit}-${card.value}-${i}`}
+                  onClick={() => handleCardClick(i)}
+                  className="shrink-0"
+                >
                   <PlayingCard
                     suit={card.suit}
                     value={card.value}
                     isPlayable={canPlayCard(card)}
                     isSelected={selectedCard === i}
+                    isHighlighted={isMyTurn && canPlayCard(card) && selectedCard !== i}
                   />
                 </div>
               ))}
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 bg-slate-900/80 backdrop-blur px-4 py-3 rounded-lg border border-amber-500">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 flex items-center justify-center text-white font-bold">
-                  {myName.slice(0, 2).toUpperCase()}
-                </div>
-                <div>
-                  <div className="text-white font-semibold">{myName}</div>
-                  <div className="text-sm text-slate-400">Version {game.stateVersion}</div>
-                </div>
-              </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <PlayerSummary
+                name={myName}
+                credits={user?.credits ?? 0}
+                tricksWon={game.myTricksWon}
+                cardsLeft={playerHand.length}
+                tone="player"
+                stateVersion={game.stateVersion}
+              />
 
               <Button
                 size="lg"
                 disabled={selectedCard === null || !isMyTurn || isPlaying}
                 onClick={handlePlayCard}
+                className={`w-full sm:w-auto ${selectedCard !== null && isMyTurn ? "shadow-lg shadow-amber-500/30" : ""}`}
               >
-                {isPlaying ? "Jeu..." : "Jouer la carte"}
+                {isPlaying
+                  ? "Carte en cours..."
+                  : selectedPlayableCard
+                    ? `Jouer ${selectedPlayableCard.value}${getSuitSymbol(selectedPlayableCard.suit)}`
+                    : isMyTurn
+                      ? "Selectionnez une carte"
+                      : "En attente"}
               </Button>
             </div>
           </div>
@@ -531,7 +606,25 @@ export function GameRoom() {
 
         <div className="xl:hidden px-4 pb-4">
           <div className="max-w-4xl mx-auto">
-            <TrickHistoryPanel game={game} myName={myName} compact />
+            <button
+              type="button"
+              onClick={() => setIsMobileHistoryOpen((open) => !open)}
+              className="flex w-full items-center justify-between rounded-lg border border-slate-700 bg-slate-900/85 px-4 py-3 text-left text-white shadow-lg"
+            >
+              <span className="flex items-center gap-2 font-semibold">
+                <History className="h-4 w-4 text-amber-400" />
+                Historique des plis
+              </span>
+              <span className="flex items-center gap-2 text-xs text-slate-400">
+                {game.rounds.filter((round) => round.moves.length > 0).length}/5
+                <ChevronDown className={`h-4 w-4 transition-transform ${isMobileHistoryOpen ? "rotate-180" : ""}`} />
+              </span>
+            </button>
+            {isMobileHistoryOpen && (
+              <div className="mt-3">
+                <TrickHistoryPanel game={game} myName={myName} compact />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -610,6 +703,235 @@ export function GameRoom() {
   );
 }
 
+function StatusTile({
+  label,
+  value,
+  tone = "slate",
+}: {
+  label: string;
+  value: string;
+  tone?: "slate" | "amber" | "emerald";
+}) {
+  const toneClass = {
+    slate: "border-slate-700 bg-slate-900/80 text-white",
+    amber: "border-amber-400/40 bg-amber-400/10 text-amber-200",
+    emerald: "border-emerald-400/40 bg-emerald-400/10 text-emerald-200",
+  }[tone];
+
+  return (
+    <div className={`rounded-lg border px-3 py-2 backdrop-blur ${toneClass}`}>
+      <div className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+        {label}
+      </div>
+      <div className="truncate text-base font-black sm:text-lg">{value}</div>
+    </div>
+  );
+}
+
+function PlayerSummary({
+  name,
+  credits,
+  tricksWon,
+  cardsLeft,
+  tone,
+  stateVersion,
+}: {
+  name: string;
+  credits: number;
+  tricksWon: number;
+  cardsLeft: number;
+  tone: "player" | "opponent";
+  stateVersion?: number;
+}) {
+  const isPlayer = tone === "player";
+
+  return (
+    <div
+      className={`
+        flex min-w-0 items-center gap-3 rounded-lg border px-4 py-3 backdrop-blur
+        ${isPlayer ? "border-amber-500 bg-slate-900/85" : "border-slate-700 bg-slate-900/80"}
+      `}
+    >
+      <div
+        className={`
+          flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-black text-white
+          ${isPlayer ? "bg-gradient-to-r from-amber-500 to-amber-600" : "bg-gradient-to-r from-red-500 to-red-600"}
+        `}
+      >
+        {name.slice(0, 2).toUpperCase()}
+      </div>
+      <div className="min-w-0">
+        <div className="truncate font-semibold text-white">{name}</div>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+          <span className="inline-flex items-center gap-1">
+            <Coins className="h-3.5 w-3.5 text-amber-400" />
+            {credits} credits
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Trophy className="h-3.5 w-3.5 text-amber-300" />
+            {tricksWon} pli{tricksWon > 1 ? "s" : ""}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Shield className="h-3.5 w-3.5 text-slate-300" />
+            {cardsLeft} carte{cardsLeft > 1 ? "s" : ""}
+          </span>
+          {stateVersion ? <span className="text-slate-500">v{stateVersion}</span> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyTableMessage({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="rounded-xl border border-dashed border-slate-700 bg-slate-950/55 px-8 py-6 text-center text-slate-400">
+      <div className="text-sm font-semibold text-slate-300">{title}</div>
+      <div className="mt-1 text-xs">{description}</div>
+    </div>
+  );
+}
+
+function ErrorBanner({
+  message,
+  onRetry,
+  onDismiss,
+  onLobby,
+  isRetrying,
+}: {
+  message: string;
+  onRetry: () => void;
+  onDismiss: () => void;
+  onLobby: () => void;
+  isRetrying: boolean;
+}) {
+  const kind = getErrorKind(message);
+
+  return (
+    <div className="mx-auto w-full max-w-4xl px-4">
+      <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-red-100 shadow-lg shadow-red-950/20">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-300" />
+            <div className="min-w-0">
+              <div className="font-semibold">{kind.title}</div>
+              <div className="mt-1 text-sm text-red-100/85">{message}</div>
+              <div className="mt-1 text-xs text-red-100/65">{kind.hint}</div>
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onRetry}
+              disabled={isRetrying}
+              className="inline-flex items-center gap-1 rounded-md border border-red-300/30 bg-red-950/30 px-3 py-2 text-xs font-semibold text-red-50 disabled:opacity-60"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isRetrying ? "animate-spin" : ""}`} />
+              Resync
+            </button>
+            <button
+              type="button"
+              onClick={onLobby}
+              className="rounded-md border border-red-300/30 bg-red-950/30 px-3 py-2 text-xs font-semibold text-red-50"
+            >
+              Lobby
+            </button>
+            <button
+              type="button"
+              onClick={onDismiss}
+              className="rounded-md px-3 py-2 text-xs font-semibold text-red-100/75 hover:text-white"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getErrorKind(message: string) {
+  const normalized = message.toLowerCase();
+  if (normalized.includes("sync") || normalized.includes("version")) {
+    return {
+      title: "Etat de partie desynchronise",
+      hint: "Resynchronisez la partie avant de rejouer une carte.",
+    };
+  }
+  if (normalized.includes("tour") || normalized.includes("couleur") || normalized.includes("carte")) {
+    return {
+      title: "Action impossible",
+      hint: "Verifiez le tour en cours et les cartes autorisees.",
+    };
+  }
+  if (normalized.includes("network") || normalized.includes("fetch") || normalized.includes("reseau")) {
+    return {
+      title: "Connexion instable",
+      hint: "La resynchronisation permet de recuperer le dernier etat connu.",
+    };
+  }
+
+  return {
+    title: "Erreur de partie",
+    hint: "Vous pouvez resynchroniser ou revenir au lobby.",
+  };
+}
+
+function getTurnState({
+  status,
+  isMyTurn,
+  leadSuit,
+  currentTrickCount,
+  selectedCard,
+  playableCardsCount,
+  opponentName,
+}: {
+  status: GameFull["status"];
+  isMyTurn: boolean;
+  leadSuit: Suit | null;
+  currentTrickCount: number;
+  selectedCard: Card | null;
+  playableCardsCount: number;
+  opponentName: string;
+}) {
+  if (status === "waiting") {
+    return {
+      shortLabel: "Attente",
+      title: "En attente d'un adversaire",
+      description: "La partie demarrera automatiquement quand un joueur rejoint la table.",
+      headerClass: "border-slate-700 bg-slate-900/80 text-slate-200",
+      panelClass: "border-slate-700 bg-slate-900/85",
+    };
+  }
+
+  if (isMyTurn) {
+    const leadText = leadSuit
+      ? `Suivez ${getSuitLabel(leadSuit)} si vous avez cette couleur.`
+      : "Vous ouvrez le pli, choisissez la couleur avec votre premiere carte.";
+    const selectionText = selectedCard
+      ? `Carte selectionnee: ${selectedCard.value}${getSuitSymbol(selectedCard.suit)}.`
+      : `${playableCardsCount} carte${playableCardsCount > 1 ? "s" : ""} disponible${playableCardsCount > 1 ? "s" : ""}.`;
+
+    return {
+      shortLabel: "A vous",
+      title: "A vous de jouer",
+      description: `${leadText} ${selectionText}`,
+      headerClass: "border-emerald-300/50 bg-emerald-400/15 text-emerald-100 shadow-lg shadow-emerald-950/30",
+      panelClass: "border-emerald-300/50 bg-gradient-to-br from-emerald-500/20 via-slate-900/90 to-slate-950/95",
+    };
+  }
+
+  return {
+    shortLabel: "Adversaire",
+    title: `${opponentName} doit jouer`,
+    description:
+      currentTrickCount === 0
+        ? "L'adversaire ouvre ce pli. La couleur demandee apparaitra apres son coup."
+        : "Attendez la deuxieme carte pour connaitre le gagnant du pli.",
+    headerClass: "border-amber-400/40 bg-amber-400/10 text-amber-100",
+    panelClass: "border-amber-400/40 bg-gradient-to-br from-amber-500/15 via-slate-900/90 to-slate-950/95",
+  };
+}
+
 function TrickHistoryPanel({
   game,
   myName,
@@ -623,6 +945,8 @@ function TrickHistoryPanel({
 }) {
   const rounds = [...game.rounds].sort((a, b) => a.number - b.number);
   const completedRounds = rounds.filter((round) => round.moves.length > 0);
+  const myWonRounds = completedRounds.filter((round) => round.winner === myName).length;
+  const opponentWonRounds = completedRounds.filter((round) => round.winner && round.winner !== myName).length;
 
   return (
     <aside
@@ -633,12 +957,19 @@ function TrickHistoryPanel({
         shadow-2xl shadow-black/30 overflow-hidden
       `}
     >
-      <div className="flex items-center justify-between gap-3 border-b border-slate-800 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 border-b border-slate-800 bg-slate-900/70 px-4 py-3">
         <div className="flex items-center gap-2 text-white font-semibold">
           <History className="w-4 h-4 text-amber-400" />
           Historique des plis
         </div>
-        <div className="text-xs text-slate-400">{completedRounds.length}/5</div>
+        <div className="flex items-center gap-2">
+          <div className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-xs font-semibold text-amber-200">
+            Vous {myWonRounds} - {opponentWonRounds}
+          </div>
+          <div className="rounded-full border border-slate-700 bg-slate-950 px-2 py-0.5 text-xs font-semibold text-slate-300">
+            {completedRounds.length}/5
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
@@ -655,41 +986,81 @@ function TrickHistoryPanel({
               <div
                 key={round.number}
                 className={`
-                  rounded-lg border p-3
-                  ${didWinRound ? "border-amber-500/40 bg-amber-500/10" : "border-slate-800 bg-slate-900/70"}
+                  rounded-lg border p-3 shadow-lg
+                  ${didWinRound
+                    ? "border-amber-400/60 bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-950 shadow-amber-950/30"
+                    : "border-slate-800 bg-slate-900/80 shadow-black/20"}
                 `}
               >
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="text-sm font-semibold text-white">Pli {round.number}</div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-700 bg-slate-950 text-sm font-bold text-white">
+                      {round.number}
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-white">Pli {round.number}</div>
+                      <div className="text-[11px] text-slate-500">
+                        {round.moves.length}/2 cartes
+                      </div>
+                    </div>
+                  </div>
                   {round.winner ? (
-                    <div className="flex items-center gap-1 text-xs text-amber-300">
+                    <div className="flex shrink-0 items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-1 text-xs font-semibold text-amber-200">
                       <Trophy className="w-3.5 h-3.5" />
                       {round.winner === myName ? "Vous" : round.winner}
                     </div>
                   ) : (
-                    <div className="text-xs text-slate-500">En cours</div>
+                    <div className="shrink-0 rounded-full border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-400">
+                      En cours
+                    </div>
                   )}
                 </div>
 
-                <div className="mb-3 text-xs text-slate-400">
-                  Couleur demandee :{" "}
-                  <span className="text-slate-200">
-                    {leadCard ? getApiSuitLabel(leadCard.suit) : "-"}
-                  </span>
-                </div>
+                {leadCard ? (
+                  <div className="mb-3 flex items-center justify-between gap-2 rounded-md border border-slate-800 bg-slate-950/70 px-2.5 py-2 text-xs">
+                    <span className="text-slate-400">Couleur demandee</span>
+                    <SuitBadge suit={leadCard.suit} />
+                  </div>
+                ) : null}
 
-                <div className="space-y-2">
-                  {round.moves.map((move) => (
-                    <div
-                      key={`${round.number}-${move.playOrder}-${move.player}`}
-                      className="flex items-center justify-between gap-3 rounded-md bg-slate-950/70 px-2 py-2"
-                    >
-                      <div className="min-w-0 text-sm text-slate-200 truncate">
-                        {move.player === myName ? "Vous" : move.player}
-                      </div>
-                      <MiniCard card={move.card} />
+                <div className="rounded-lg border border-slate-800 bg-slate-950/65 p-2">
+                  <div className="flex items-stretch justify-center gap-2">
+                    {round.moves.map((move) => {
+                      const didWinMove = move.player === round.winner;
+
+                      return (
+                        <div
+                          key={`${round.number}-${move.playOrder}-${move.player}`}
+                          className={`
+                            relative flex min-w-0 flex-1 flex-col items-center gap-2 rounded-lg border px-2 py-2
+                            ${didWinMove
+                              ? "border-amber-400/45 bg-amber-400/10"
+                              : "border-slate-800 bg-slate-900/70"}
+                          `}
+                        >
+                          {didWinMove && (
+                            <div className="absolute -top-2 rounded-full border border-amber-300/50 bg-amber-400 px-1.5 py-0.5 text-[10px] font-black text-slate-950 shadow">
+                              Gagne
+                            </div>
+                          )}
+                          <MiniCard card={move.card} isWinner={didWinMove} />
+                          <div className="w-full min-w-0 text-center">
+                            <div className="truncate text-xs font-semibold text-slate-100">
+                              {move.player === myName ? "Vous" : move.player}
+                            </div>
+                            <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                              {move.playOrder === 1 ? "Ouverture" : "Reponse"}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {round.moves.length === 1 && (
+                    <div className="mt-2 rounded-md border border-dashed border-slate-800 px-3 py-2 text-center text-xs text-slate-500">
+                      En attente de la deuxieme carte
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             );
@@ -700,15 +1071,62 @@ function TrickHistoryPanel({
   );
 }
 
-function MiniCard({ card }: { card: ApiCard }) {
-  const isRed = card.suit === "H" || card.suit === "D";
+function SuitDemandBadge({ suit }: { suit: Suit }) {
+  const isRed = suit === "hearts" || suit === "diamonds";
 
   return (
-    <div className="flex h-9 min-w-12 items-center justify-center rounded-md border border-slate-300 bg-white px-2 text-sm font-bold shadow">
-      <span className={isRed ? "text-red-600" : "text-slate-900"}>
-        {card.value}
+    <span
+      className={`
+        inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-xs font-black shadow
+        ${isRed ? "border-red-200 text-red-600" : "border-slate-300 text-slate-950"}
+      `}
+    >
+      <span className="text-base leading-none">{getSuitSymbol(suit)}</span>
+      <span>Couleur demandee: {getSuitLabel(suit)}</span>
+    </span>
+  );
+}
+
+function SuitBadge({ suit }: { suit: ApiCard["suit"] }) {
+  const isRed = suit === "H" || suit === "D";
+
+  return (
+    <span
+      className={`
+        inline-flex items-center gap-1 rounded-full border bg-white px-2 py-1 font-bold shadow-sm
+        ${isRed ? "border-red-200 text-red-600" : "border-slate-300 text-slate-900"}
+      `}
+    >
+      <span className="text-sm leading-none">{getApiSuitSymbol(suit)}</span>
+      <span>{getApiSuitLabel(suit)}</span>
+    </span>
+  );
+}
+
+function MiniCard({ card, isWinner = false }: { card: ApiCard; isWinner?: boolean }) {
+  const isRed = card.suit === "H" || card.suit === "D";
+  const suitClass = isRed ? "text-red-600" : "text-slate-900";
+
+  return (
+    <div
+      className={`
+        relative h-20 w-14 shrink-0 overflow-hidden rounded-md border-2 bg-white shadow-lg shadow-black/30
+        ${isWinner ? "border-amber-300 ring-2 ring-amber-300/50" : "border-slate-200"}
+      `}
+    >
+      <div className="absolute inset-0 rounded-md bg-gradient-to-br from-white via-slate-50 to-white" />
+      <div className={`absolute left-1 top-1 z-10 flex flex-col items-center text-sm font-black leading-none ${suitClass}`}>
+        <span>{card.value}</span>
+        <span className="text-base">{getApiSuitSymbol(card.suit)}</span>
+      </div>
+      <div className={`absolute inset-0 z-10 flex items-center justify-center text-4xl leading-none ${suitClass}`}>
         {getApiSuitSymbol(card.suit)}
-      </span>
+      </div>
+      <div className={`absolute bottom-1 right-1 z-10 flex rotate-180 flex-col items-center text-sm font-black leading-none ${suitClass}`}>
+        <span>{card.value}</span>
+        <span className="text-base">{getApiSuitSymbol(card.suit)}</span>
+      </div>
+      <div className="absolute inset-0 rounded-md bg-gradient-to-br from-white/60 via-transparent to-transparent" />
     </div>
   );
 }
@@ -729,13 +1147,39 @@ function getApiSuitLabel(suit: ApiCard["suit"]) {
 function getApiSuitSymbol(suit: ApiCard["suit"]) {
   switch (suit) {
     case "H":
-      return "H";
+      return "♥";
     case "D":
-      return "D";
+      return "♦";
     case "C":
-      return "C";
+      return "♣";
     case "S":
-      return "S";
+      return "♠";
+  }
+}
+
+function getSuitLabel(suit: Suit) {
+  switch (suit) {
+    case "hearts":
+      return "Coeur";
+    case "diamonds":
+      return "Carreau";
+    case "clubs":
+      return "Trefle";
+    case "spades":
+      return "Pique";
+  }
+}
+
+function getSuitSymbol(suit: Suit) {
+  switch (suit) {
+    case "hearts":
+      return "♥";
+    case "diamonds":
+      return "♦";
+    case "clubs":
+      return "♣";
+    case "spades":
+      return "♠";
   }
 }
 

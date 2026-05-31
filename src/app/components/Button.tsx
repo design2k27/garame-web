@@ -1,7 +1,7 @@
-import { motion } from "motion/react";
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { motion, type HTMLMotionProps } from "motion/react";
+import type { ReactNode } from "react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   children: ReactNode;
   variant?: "primary" | "secondary" | "outline" | "danger";
   size?: "sm" | "md" | "lg";

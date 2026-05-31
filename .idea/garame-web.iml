@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/garame-api/assets/vendor" />
       <excludeFolder url="file://$MODULE_DIR$/garame-api/public/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/garame-api/vendor" />
+      <excludeFolder url="file://$MODULE_DIR$/garame-api/var" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

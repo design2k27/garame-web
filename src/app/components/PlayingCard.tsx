@@ -8,6 +8,7 @@ interface PlayingCardProps {
   value: CardValue;
   isPlayable?: boolean;
   isSelected?: boolean;
+  isHighlighted?: boolean;
   onClick?: () => void;
   className?: string;
   size?: "sm" | "md" | "lg";
@@ -33,6 +34,7 @@ export function PlayingCard({
   value,
   isPlayable = true,
   isSelected = false,
+  isHighlighted = false,
   onClick,
   className = "",
   size = "md",
@@ -79,20 +81,25 @@ export function PlayingCard({
 
   return (
     <motion.div
+      animate={isHighlighted ? { y: [0, -4, 0] } : { y: 0 }}
+      transition={isHighlighted ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" } : undefined}
       whileHover={isPlayable ? { y: -12, scale: 1.05 } : {}}
       whileTap={isPlayable ? { scale: 0.98 } : {}}
       onClick={isPlayable ? onClick : undefined}
       className={`
         ${currentSize.container}
-        bg-white rounded-lg shadow-2xl relative
-        border-2 border-gray-300
-        ${isPlayable ? "cursor-pointer hover:shadow-amber-500/50 hover:border-amber-400 transition-all" : "opacity-30 cursor-not-allowed grayscale saturate-50"}
+        bg-white rounded-lg shadow-2xl relative overflow-hidden
+        border-2
+        ${isPlayable ? "cursor-pointer border-gray-300 hover:shadow-amber-500/50 hover:border-amber-400 transition-all" : "cursor-not-allowed border-slate-400 opacity-45 grayscale saturate-50"}
+        ${isHighlighted ? "ring-2 ring-emerald-300/80 shadow-emerald-400/40" : ""}
         ${isSelected ? "ring-4 ring-amber-400 shadow-amber-500/50 -translate-y-3" : ""}
         ${className}
       `}
       style={{
         boxShadow: isSelected
           ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 0 4px rgb(251 191 36)"
+          : isHighlighted
+            ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 24px rgba(110, 231, 183, 0.35)"
           : "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)"
       }}
     >
@@ -143,6 +150,13 @@ export function PlayingCard({
 
       {/* Glossy effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent rounded-lg pointer-events-none" />
+      {!isPlayable && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/20">
+          <div className="rounded-full border border-slate-300/80 bg-white/85 px-2 py-1 text-[10px] font-bold uppercase text-slate-700 shadow">
+            Bloquee
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -13,6 +13,7 @@ Ce dossier regroupe la documentation fonctionnelle et technique du backend Garam
 - [`API_MODIFICATIONS.md`](./API_MODIFICATIONS.md): journal a mettre a jour a chaque modification du code API dans `garame-api`.
 - [`FRONTEND_ENV.md`](./FRONTEND_ENV.md): configuration des variables d'environnement du front.
 - [`API_LOCAL_SETUP.md`](./API_LOCAL_SETUP.md): notes de setup pour l'API locale, notamment les cles JWT.
+- [`UX_UI_AMELIORATION_PLAN.md`](./UX_UI_AMELIORATION_PLAN.md): plan iteratif d'amelioration de l'experience, du design et du tour de jeu.
 
 ## Lecture recommandee
 

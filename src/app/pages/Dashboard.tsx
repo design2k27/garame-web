@@ -2,7 +2,18 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../components/Button";
 import { motion } from "motion/react";
-import { Trophy, TrendingUp, Wallet as WalletIcon, Play, History, BarChart3, LogOut } from "lucide-react";
+import {
+  BarChart3,
+  Flame,
+  History,
+  LogOut,
+  Medal,
+  Play,
+  Target,
+  Trophy,
+  TrendingUp,
+  Wallet as WalletIcon,
+} from "lucide-react";
 import { getApiErrorMessage } from "../api/client";
 import { getHistory, getProfileStats } from "../api/garameApi";
 import type { HistoryResponse, ProfileStatsResponse } from "../api/types";
@@ -50,6 +61,11 @@ export function Dashboard() {
   const summary = data?.stats.summary;
   const recent = data?.stats.recent ?? [];
   const streak = data?.stats.streak;
+  const losses = summary?.losses ?? 0;
+  const wins = summary?.wins ?? 0;
+  const totalGames = summary?.totalGames ?? 0;
+  const winRate = summary?.winRate ?? 0;
+  const favoriteWinType = getFavoriteWinType(data?.stats.byWinType);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -91,29 +107,92 @@ export function Dashboard() {
         )}
 
         {isLoading ? (
-          <div className="text-slate-300">Chargement du tableau de bord...</div>
+          <DashboardSkeleton />
         ) : (
           <>
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <section className="mb-8 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border border-slate-700 bg-slate-800/50 p-6 shadow-2xl shadow-black/20 backdrop-blur"
+              >
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-xl font-black text-white">
+                      {getInitials(user?.username ?? "Vous")}
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">Profil joueur</div>
+                      <h2 className="text-3xl font-black text-white">{user?.username ?? "Vous"}</h2>
+                      <p className="text-sm text-slate-400">{user?.email}</p>
+                    </div>
+                  </div>
+                  <Button size="lg" onClick={() => navigate("/lobby")}>
+                    <Play className="w-5 h-5 mr-2 inline" />
+                    Jouer maintenant
+                  </Button>
+                </div>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  <ProfileMetric label="Solde" value={`${summary?.credits ?? user?.credits ?? 0}`} suffix="credits" />
+                  <ProfileMetric label="Parties" value={`${totalGames}`} suffix="jouees" />
+                  <ProfileMetric label="Winrate" value={`${winRate}%`} suffix={getWinrateLabel(winRate)} />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-950 p-6 shadow-2xl shadow-black/20"
+              >
+                <div className="flex items-center gap-2 text-amber-200">
+                  <Flame className="h-5 w-5" />
+                  <span className="font-bold">Dynamique</span>
+                </div>
+                <div className="mt-4 text-4xl font-black text-white">
+                  {streak?.type === "none" ? "Aucune serie" : `${streak?.count ?? 0}`}
+                </div>
+                <div className="mt-1 text-sm text-slate-300">
+                  {streak?.type === "win"
+                    ? "victoire(s) de suite"
+                    : streak?.type === "loss"
+                      ? "defaite(s) de suite"
+                      : "Jouez une partie pour lancer une serie"}
+                </div>
+                <div className="mt-5 rounded-lg border border-slate-700 bg-slate-950/60 p-3 text-sm text-slate-300">
+                  Style fort: <span className="font-bold text-amber-200">{favoriteWinType}</span>
+                </div>
+              </motion.div>
+            </section>
+
+            <div className="grid md:grid-cols-4 gap-4 mb-8">
               <StatCard
                 icon={<Trophy className="w-6 h-6" />}
                 title="Victoires"
-                value={`${summary?.wins ?? 0}`}
-                subtitle={`${summary?.totalGames ?? 0} parties jouees`}
+                value={`${wins}`}
+                subtitle={`${totalGames} parties jouees`}
                 trend="up"
               />
               <StatCard
                 icon={<TrendingUp className="w-6 h-6" />}
                 title="Winrate"
-                value={`${summary?.winRate ?? 0}%`}
+                value={`${winRate}%`}
                 subtitle={streak?.type === "none" ? "Aucune serie" : `${streak?.count ?? 0} ${streak?.type === "win" ? "victoire(s)" : "defaite(s)"} de suite`}
                 trend={streak?.type === "loss" ? "down" : "up"}
               />
               <StatCard
-                icon={<WalletIcon className="w-6 h-6" />}
-                title="Credits"
-                value={`${summary?.credits ?? user?.credits ?? 0}`}
-                subtitle="Solde de classement"
+                icon={<Target className="w-6 h-6" />}
+                title="Defaites"
+                value={`${losses}`}
+                subtitle={totalGames ? `${Math.max(0, 100 - winRate)}% des parties` : "Aucune partie"}
+                trend="down"
+              />
+              <StatCard
+                icon={<Medal className="w-6 h-6" />}
+                title="Specialite"
+                value={favoriteWinType}
+                subtitle="Type de victoire dominant"
                 trend="up"
               />
             </div>
@@ -146,7 +225,12 @@ export function Dashboard() {
                 </div>
                 <div className="space-y-3">
                   {recent.length === 0 ? (
-                    <div className="text-slate-400">Aucune partie terminee pour le moment.</div>
+                    <EmptyState
+                      title="Aucune partie terminee"
+                      description="Lancez une partie pour remplir votre historique et suivre vos progres."
+                      actionLabel="Jouer maintenant"
+                      onAction={() => navigate("/lobby")}
+                    />
                   ) : (
                     recent.slice(0, 6).map((item) => (
                       <GameHistoryItem
@@ -169,6 +253,7 @@ export function Dashboard() {
                 </div>
                 <div className="space-y-4">
                   <StatRow label="Parties jouees" value={`${summary?.gamesPlayed ?? 0}`} />
+                  <StatRow label="Parties gagnees" value={`${summary?.gamesWon ?? 0}`} />
                   <StatRow label="Victoires Korat" value={`${data?.stats.byWinType.korat.wins ?? 0}`} />
                   <StatRow label="Three 7 reussis" value={`${data?.stats.byWinType.three_seven.wins ?? 0}`} />
                   <StatRow label="Moins de 21 reussis" value={`${data?.stats.byWinType.moins_21.wins ?? 0}`} />
@@ -194,6 +279,50 @@ function formatDate(date: string) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(date));
+}
+
+function getWinrateLabel(winRate: number) {
+  if (winRate >= 70) return "excellent";
+  if (winRate >= 50) return "stable";
+  if (winRate > 0) return "a travailler";
+  return "nouveau";
+}
+
+function getFavoriteWinType(byWinType?: ProfileStatsResponse["stats"]["byWinType"]) {
+  if (!byWinType) return "A determiner";
+
+  const entries = Object.entries(byWinType).sort(([, a], [, b]) => b.wins - a.wins);
+  const [winType, stats] = entries[0] ?? [];
+  if (!winType || !stats?.wins) return "A determiner";
+
+  return getWinTypeLabel(winType);
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-8">
+      <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="h-48 animate-pulse rounded-2xl bg-slate-900" />
+        <div className="h-48 animate-pulse rounded-2xl bg-slate-900" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="h-32 animate-pulse rounded-xl bg-slate-900" />
+        ))}
+      </div>
+      <div className="h-52 animate-pulse rounded-2xl bg-slate-900" />
+    </div>
+  );
+}
+
+function ProfileMetric({ label, value, suffix }: { label: string; value: string; suffix: string }) {
+  return (
+    <div className="rounded-lg border border-slate-700 bg-slate-950/55 p-3">
+      <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</div>
+      <div className="mt-1 text-2xl font-black text-white">{value}</div>
+      <div className="text-xs text-slate-400">{suffix}</div>
+    </div>
+  );
 }
 
 function StatCard({
@@ -250,9 +379,7 @@ function GameHistoryItem({
         </div>
         <div className="text-sm text-slate-500">{time}</div>
       </div>
-      <div
-        className={`font-bold ${result === "win" ? "text-green-400" : "text-red-400"}`}
-      >
+      <div className={`font-bold ${result === "win" ? "text-green-400" : "text-red-400"}`}>
         {amount > 0 ? "+" : ""}
         {amount} credits
       </div>
@@ -265,6 +392,28 @@ function StatRow({ label, value }: { label: string; value: string }) {
     <div className="flex justify-between items-center">
       <span className="text-slate-400">{label}</span>
       <span className="text-white font-semibold">{value}</span>
+    </div>
+  );
+}
+
+function EmptyState({
+  title,
+  description,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  description: string;
+  actionLabel: string;
+  onAction: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-6 text-center">
+      <div className="font-semibold text-white">{title}</div>
+      <div className="mt-1 text-sm text-slate-400">{description}</div>
+      <Button className="mt-4" size="sm" onClick={onAction}>
+        {actionLabel}
+      </Button>
     </div>
   );
 }

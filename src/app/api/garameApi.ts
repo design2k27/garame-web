@@ -2,6 +2,7 @@ import { apiFetch } from "./client";
 import type {
   AuthResponse,
   GameFull,
+  GameSummary,
   HistoryResponse,
   ListGamesResponse,
   PollResponse,
@@ -46,21 +47,21 @@ export function getMyActiveGames(token: string) {
 }
 
 export function createGame(token: string) {
-  return apiFetch<SingleGameResponse>("/api/games", {
+  return apiFetch<SingleGameResponse<GameSummary>>("/api/games", {
     method: "POST",
     token,
   });
 }
 
 export function joinGame(token: string, gameId: string) {
-  return apiFetch<SingleGameResponse>(`/api/games/${gameId}/join`, {
+  return apiFetch<SingleGameResponse<GameSummary>>(`/api/games/${gameId}/join`, {
     method: "POST",
     token,
   });
 }
 
 export function startMatchmaking(token: string) {
-  return apiFetch<SingleGameResponse>(`/api/games/matchmaking`, {
+  return apiFetch<SingleGameResponse<GameSummary>>(`/api/games/matchmaking`, {
     method: "POST",
     token,
   });
