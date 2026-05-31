@@ -51,15 +51,15 @@ export function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+    <div className="app-page flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md"
       >
-        <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-2xl p-8">
+        <div className="app-card p-8">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mb-2">
+            <h1 className="app-brand-text text-4xl font-bold mb-2">
               GARAME
             </h1>
             <p className="text-slate-400">
@@ -79,7 +79,7 @@ export function AuthPage() {
                     value={username}
                     onChange={(event) => setUsername(event.target.value)}
                     required={!isLogin}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-10 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="app-input"
                   />
                 </div>
               </div>
@@ -95,7 +95,7 @@ export function AuthPage() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   required
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-10 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="app-input"
                 />
               </div>
             </div>
@@ -110,7 +110,7 @@ export function AuthPage() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-10 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="app-input"
                 />
               </div>
             </div>
@@ -128,19 +128,19 @@ export function AuthPage() {
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
                     required={!isLogin}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-10 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="app-input"
                   />
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              <div className="app-danger-box">
                 {error}
               </div>
             )}
 
-            <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>
+            <Button variant="app" type="submit" className="w-full mt-6" disabled={isSubmitting}>
               {isSubmitting
                 ? "Veuillez patienter..."
                 : isLogin
@@ -155,7 +155,7 @@ export function AuthPage() {
                 setIsLogin(!isLogin);
                 setError(null);
               }}
-              className="text-amber-500 hover:text-amber-400 transition-colors"
+              className="app-action-text"
             >
               {isLogin
                 ? "Pas encore de compte ? S'inscrire"

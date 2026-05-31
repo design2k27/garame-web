@@ -338,16 +338,16 @@ export function GameRoom() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 px-4 py-6 text-slate-300">
+      <div className="app-page px-4 py-6 text-neutral-300">
         <div className="mx-auto flex min-h-[80vh] max-w-4xl flex-col justify-center gap-6">
-          <div className="h-12 w-48 animate-pulse rounded-lg bg-slate-800" />
+          <div className="h-12 w-48 animate-pulse rounded-lg bg-white/10" />
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="h-24 animate-pulse rounded-lg bg-slate-900" />
-            <div className="h-24 animate-pulse rounded-lg bg-slate-900" />
-            <div className="h-24 animate-pulse rounded-lg bg-slate-900" />
+            <div className="h-24 animate-pulse rounded-lg bg-white/[0.08]" />
+            <div className="h-24 animate-pulse rounded-lg bg-white/[0.08]" />
+            <div className="h-24 animate-pulse rounded-lg bg-white/[0.08]" />
           </div>
-          <div className="h-72 animate-pulse rounded-xl border border-slate-800 bg-slate-900/70" />
-          <div className="text-center text-sm text-slate-400">Chargement de la partie...</div>
+          <div className="h-72 animate-pulse rounded-xl border border-white/10 bg-[#151515]/70" />
+          <div className="text-center text-sm text-neutral-400">Chargement de la partie...</div>
         </div>
       </div>
     );
@@ -355,10 +355,10 @@ export function GameRoom() {
 
   if (!game) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      <div className="app-page flex items-center justify-center px-4">
         <div className="max-w-md text-center">
           <div className="text-red-300 mb-4">{error ?? "Partie introuvable."}</div>
-          <Button onClick={() => navigate("/lobby")}>Retour au lobby</Button>
+          <Button variant="app" onClick={() => navigate("/lobby")}>Retour au lobby</Button>
         </div>
       </div>
     );
@@ -395,16 +395,16 @@ export function GameRoom() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-x-hidden">
+    <div className="app-page relative overflow-x-hidden">
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-900/30 via-green-800/20 to-green-900/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-950/35 via-[#111111]/45 to-black/70" />
         <div
           className="absolute inset-0"
           style={{
             backgroundImage: `
-              radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.15) 0%, transparent 60%),
-              radial-gradient(circle at 30% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
-              radial-gradient(circle at 70% 60%, rgba(5, 150, 105, 0.1) 0%, transparent 40%)
+              radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.18) 0%, transparent 60%),
+              radial-gradient(circle at 28% 38%, rgba(253, 224, 71, 0.10) 0%, transparent 36%),
+              radial-gradient(circle at 72% 62%, rgba(168, 85, 247, 0.12) 0%, transparent 42%)
             `,
           }}
         />
@@ -426,7 +426,7 @@ export function GameRoom() {
         <div className="p-4">
           <div className="mx-auto flex max-w-5xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <Button
-              variant="secondary"
+              variant="appOutline"
               size="sm"
               onClick={() => navigate("/dashboard")}
               className="w-fit"
@@ -443,7 +443,7 @@ export function GameRoom() {
             </div>
 
             {isResyncing && (
-              <div className="w-fit rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-sm text-blue-200">
+              <div className="w-fit rounded-lg border border-violet-300/35 bg-violet-500/10 px-3 py-2 text-sm font-semibold text-violet-100">
                 resync
               </div>
             )}
@@ -478,7 +478,7 @@ export function GameRoom() {
               </div>
             </div>
 
-            <div className="flex min-h-32 justify-center gap-2 rounded-xl border border-slate-800 bg-slate-950/35 px-3 py-4">
+            <div className="flex min-h-32 justify-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-4 shadow-inner shadow-black/30">
               {opponentCardsCount > 0 ? (
                 Array.from({ length: opponentCardsCount }).map((_, i) => (
                   <motion.div
@@ -502,29 +502,29 @@ export function GameRoom() {
 
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="relative w-full max-w-4xl">
-            <div className="absolute inset-0 -m-32 bg-gradient-to-br from-green-900/30 to-green-800/30 rounded-full blur-3xl" />
+            <div className="absolute inset-0 -m-32 rounded-full bg-gradient-to-br from-violet-700/24 via-yellow-300/10 to-black/20 blur-3xl" />
 
             <div className={`relative z-20 mx-auto mb-5 max-w-2xl rounded-xl border px-5 py-4 text-center shadow-2xl backdrop-blur ${turnState.panelClass}`}>
               <div className="text-xs font-bold uppercase tracking-[0.22em] opacity-80">Tour en cours</div>
               <div className="mt-1 text-2xl font-black text-white">{turnState.title}</div>
-              <div className="mt-1 text-sm text-slate-200">{turnState.description}</div>
+              <div className="mt-1 text-sm text-neutral-200">{turnState.description}</div>
               <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
                 {leadSuit ? (
                   <SuitDemandBadge suit={leadSuit} />
                 ) : (
-                  <span className="rounded-full border border-slate-600 bg-slate-950/70 px-3 py-1 text-xs font-semibold text-slate-300">
+                  <span className="rounded-full border border-white/10 bg-black/50 px-3 py-1 text-xs font-semibold text-neutral-300">
                     Aucune couleur demandee
                   </span>
                 )}
                 {isMyTurn && (
-                  <span className="rounded-full border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+                  <span className="rounded-full border border-violet-300/40 bg-violet-500/12 px-3 py-1 text-xs font-semibold text-violet-100">
                     {playableCardsCount} carte{playableCardsCount > 1 ? "s" : ""} jouable{playableCardsCount > 1 ? "s" : ""}
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="relative z-10 flex min-h-[220px] items-center justify-center gap-4 rounded-2xl border border-emerald-900/50 bg-gradient-to-br from-emerald-950/45 via-slate-950/60 to-slate-950/80 px-4 py-8 shadow-2xl shadow-black/30">
+            <div className="relative z-10 flex min-h-[220px] items-center justify-center gap-4 rounded-2xl border border-violet-300/20 bg-gradient-to-br from-[#151515]/88 via-black/70 to-violet-950/28 px-4 py-8 shadow-2xl shadow-black/40">
               <AnimatePresence>
                 {currentTrick.map((card, i) => (
                   <motion.div
@@ -547,7 +547,7 @@ export function GameRoom() {
 
             <div className="text-center mt-4">
               {result?.roundWinner && (
-                <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-200">
+                <div className="inline-flex items-center gap-2 rounded-full border border-yellow-300/40 bg-yellow-300/10 px-4 py-2 text-sm font-semibold text-yellow-100">
                   <Trophy className="h-4 w-4" />
                   Pli remporte par {result.roundWinner === myName ? "vous" : result.roundWinner}
                 </div>
@@ -556,7 +556,7 @@ export function GameRoom() {
           </div>
         </div>
 
-        <div className="sticky bottom-0 z-30 border-t border-slate-800 bg-slate-950/92 px-4 pb-4 pt-3 backdrop-blur-xl sm:relative sm:border-t-0 sm:bg-transparent sm:pt-0 sm:backdrop-blur-none">
+        <div className="sticky bottom-0 z-30 border-t border-white/10 bg-[#080808]/92 px-4 pb-4 pt-3 backdrop-blur-xl sm:relative sm:border-t-0 sm:bg-transparent sm:pt-0 sm:backdrop-blur-none">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4 flex min-h-36 justify-start gap-3 overflow-x-auto pb-2 sm:justify-center sm:overflow-visible sm:pb-0">
               {playerHand.map((card, i) => (
@@ -587,10 +587,11 @@ export function GameRoom() {
               />
 
               <Button
+                variant="app"
                 size="lg"
                 disabled={selectedCard === null || !isMyTurn || isPlaying}
                 onClick={handlePlayCard}
-                className={`w-full sm:w-auto ${selectedCard !== null && isMyTurn ? "shadow-lg shadow-amber-500/30" : ""}`}
+                className={`w-full sm:w-auto ${selectedCard !== null && isMyTurn ? "shadow-lg shadow-violet-500/35" : ""}`}
               >
                 {isPlaying
                   ? "Carte en cours..."
@@ -609,13 +610,13 @@ export function GameRoom() {
             <button
               type="button"
               onClick={() => setIsMobileHistoryOpen((open) => !open)}
-              className="flex w-full items-center justify-between rounded-lg border border-slate-700 bg-slate-900/85 px-4 py-3 text-left text-white shadow-lg"
+              className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-[#151515]/90 px-4 py-3 text-left text-white shadow-lg shadow-black/25"
             >
               <span className="flex items-center gap-2 font-semibold">
-                <History className="h-4 w-4 text-amber-400" />
+                <History className="h-4 w-4 text-yellow-300" />
                 Historique des plis
               </span>
-              <span className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="flex items-center gap-2 text-xs text-neutral-400">
                 {game.rounds.filter((round) => round.moves.length > 0).length}/5
                 <ChevronDown className={`h-4 w-4 transition-transform ${isMobileHistoryOpen ? "rotate-180" : ""}`} />
               </span>
@@ -713,14 +714,14 @@ function StatusTile({
   tone?: "slate" | "amber" | "emerald";
 }) {
   const toneClass = {
-    slate: "border-slate-700 bg-slate-900/80 text-white",
-    amber: "border-amber-400/40 bg-amber-400/10 text-amber-200",
-    emerald: "border-emerald-400/40 bg-emerald-400/10 text-emerald-200",
+    slate: "border-white/10 bg-[#151515]/85 text-white",
+    amber: "border-yellow-300/40 bg-yellow-300/10 text-yellow-100",
+    emerald: "border-violet-300/40 bg-violet-500/12 text-violet-100",
   }[tone];
 
   return (
     <div className={`rounded-lg border px-3 py-2 backdrop-blur ${toneClass}`}>
-      <div className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+      <div className="truncate text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
         {label}
       </div>
       <div className="truncate text-base font-black sm:text-lg">{value}</div>
@@ -749,33 +750,33 @@ function PlayerSummary({
     <div
       className={`
         flex min-w-0 items-center gap-3 rounded-lg border px-4 py-3 backdrop-blur
-        ${isPlayer ? "border-amber-500 bg-slate-900/85" : "border-slate-700 bg-slate-900/80"}
+        ${isPlayer ? "border-yellow-300/55 bg-[#151515]/90" : "border-violet-300/25 bg-[#101010]/86"}
       `}
     >
       <div
         className={`
           flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-black text-white
-          ${isPlayer ? "bg-gradient-to-r from-amber-500 to-amber-600" : "bg-gradient-to-r from-red-500 to-red-600"}
+          ${isPlayer ? "bg-gradient-to-r from-yellow-300 to-yellow-500 text-black" : "bg-gradient-to-r from-violet-500 to-purple-700"}
         `}
       >
         {name.slice(0, 2).toUpperCase()}
       </div>
       <div className="min-w-0">
         <div className="truncate font-semibold text-white">{name}</div>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
           <span className="inline-flex items-center gap-1">
-            <Coins className="h-3.5 w-3.5 text-amber-400" />
+            <Coins className="h-3.5 w-3.5 text-yellow-300" />
             {credits} credits
           </span>
           <span className="inline-flex items-center gap-1">
-            <Trophy className="h-3.5 w-3.5 text-amber-300" />
+            <Trophy className="h-3.5 w-3.5 text-yellow-200" />
             {tricksWon} pli{tricksWon > 1 ? "s" : ""}
           </span>
           <span className="inline-flex items-center gap-1">
-            <Shield className="h-3.5 w-3.5 text-slate-300" />
+            <Shield className="h-3.5 w-3.5 text-violet-200" />
             {cardsLeft} carte{cardsLeft > 1 ? "s" : ""}
           </span>
-          {stateVersion ? <span className="text-slate-500">v{stateVersion}</span> : null}
+          {stateVersion ? <span className="text-neutral-500">v{stateVersion}</span> : null}
         </div>
       </div>
     </div>
@@ -784,8 +785,8 @@ function PlayerSummary({
 
 function EmptyTableMessage({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-700 bg-slate-950/55 px-8 py-6 text-center text-slate-400">
-      <div className="text-sm font-semibold text-slate-300">{title}</div>
+    <div className="rounded-xl border border-dashed border-white/12 bg-black/45 px-8 py-6 text-center text-neutral-400">
+      <div className="text-sm font-semibold text-neutral-200">{title}</div>
       <div className="mt-1 text-xs">{description}</div>
     </div>
   );
@@ -898,8 +899,8 @@ function getTurnState({
       shortLabel: "Attente",
       title: "En attente d'un adversaire",
       description: "La partie demarrera automatiquement quand un joueur rejoint la table.",
-      headerClass: "border-slate-700 bg-slate-900/80 text-slate-200",
-      panelClass: "border-slate-700 bg-slate-900/85",
+      headerClass: "border-white/10 bg-[#151515]/85 text-neutral-200",
+      panelClass: "border-white/10 bg-[#151515]/90",
     };
   }
 
@@ -915,8 +916,8 @@ function getTurnState({
       shortLabel: "A vous",
       title: "A vous de jouer",
       description: `${leadText} ${selectionText}`,
-      headerClass: "border-emerald-300/50 bg-emerald-400/15 text-emerald-100 shadow-lg shadow-emerald-950/30",
-      panelClass: "border-emerald-300/50 bg-gradient-to-br from-emerald-500/20 via-slate-900/90 to-slate-950/95",
+      headerClass: "border-violet-300/50 bg-violet-500/16 text-violet-100 shadow-lg shadow-violet-950/35",
+      panelClass: "border-violet-300/50 bg-gradient-to-br from-violet-500/20 via-[#151515]/92 to-black/95",
     };
   }
 
@@ -927,8 +928,8 @@ function getTurnState({
       currentTrickCount === 0
         ? "L'adversaire ouvre ce pli. La couleur demandee apparaitra apres son coup."
         : "Attendez la deuxieme carte pour connaitre le gagnant du pli.",
-    headerClass: "border-amber-400/40 bg-amber-400/10 text-amber-100",
-    panelClass: "border-amber-400/40 bg-gradient-to-br from-amber-500/15 via-slate-900/90 to-slate-950/95",
+    headerClass: "border-yellow-300/40 bg-yellow-300/10 text-yellow-100",
+    panelClass: "border-yellow-300/40 bg-gradient-to-br from-yellow-300/14 via-[#151515]/92 to-black/95",
   };
 }
 
@@ -953,20 +954,20 @@ function TrickHistoryPanel({
       className={`
         ${compact ? "relative flex w-full max-h-56" : "absolute right-4 top-24 bottom-4 w-80"}
         ${className}
-        flex-col rounded-lg border border-slate-700 bg-slate-950/85 backdrop-blur
+        flex-col rounded-lg border border-white/10 bg-[#0b0b0c]/90 backdrop-blur
         shadow-2xl shadow-black/30 overflow-hidden
       `}
     >
-      <div className="flex items-center justify-between gap-3 border-b border-slate-800 bg-slate-900/70 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 bg-[#151515]/80 px-4 py-3">
         <div className="flex items-center gap-2 text-white font-semibold">
-          <History className="w-4 h-4 text-amber-400" />
+          <History className="w-4 h-4 text-yellow-300" />
           Historique des plis
         </div>
         <div className="flex items-center gap-2">
-          <div className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-xs font-semibold text-amber-200">
+          <div className="rounded-full border border-yellow-300/35 bg-yellow-300/10 px-2 py-0.5 text-xs font-semibold text-yellow-100">
             Vous {myWonRounds} - {opponentWonRounds}
           </div>
-          <div className="rounded-full border border-slate-700 bg-slate-950 px-2 py-0.5 text-xs font-semibold text-slate-300">
+          <div className="rounded-full border border-white/10 bg-black/55 px-2 py-0.5 text-xs font-semibold text-neutral-300">
             {completedRounds.length}/5
           </div>
         </div>
@@ -974,7 +975,7 @@ function TrickHistoryPanel({
 
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {completedRounds.length === 0 ? (
-          <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-400">
+          <div className="rounded-lg border border-white/10 bg-[#151515]/75 p-4 text-sm text-neutral-400">
             Aucun pli joue.
           </div>
         ) : (
@@ -988,42 +989,42 @@ function TrickHistoryPanel({
                 className={`
                   rounded-lg border p-3 shadow-lg
                   ${didWinRound
-                    ? "border-amber-400/60 bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-950 shadow-amber-950/30"
-                    : "border-slate-800 bg-slate-900/80 shadow-black/20"}
+                    ? "border-yellow-300/55 bg-gradient-to-br from-yellow-300/13 via-[#151515] to-black shadow-yellow-950/20"
+                    : "border-white/10 bg-[#151515]/78 shadow-black/20"}
                 `}
               >
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-700 bg-slate-950 text-sm font-bold text-white">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-md border border-violet-300/25 bg-violet-500/12 text-sm font-bold text-white">
                       {round.number}
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-white">Pli {round.number}</div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-[11px] text-neutral-500">
                         {round.moves.length}/2 cartes
                       </div>
                     </div>
                   </div>
                   {round.winner ? (
-                    <div className="flex shrink-0 items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-1 text-xs font-semibold text-amber-200">
+                    <div className="flex shrink-0 items-center gap-1 rounded-full border border-yellow-300/35 bg-yellow-300/10 px-2 py-1 text-xs font-semibold text-yellow-100">
                       <Trophy className="w-3.5 h-3.5" />
                       {round.winner === myName ? "Vous" : round.winner}
                     </div>
                   ) : (
-                    <div className="shrink-0 rounded-full border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-400">
+                    <div className="shrink-0 rounded-full border border-white/10 bg-black/55 px-2 py-1 text-xs text-neutral-400">
                       En cours
                     </div>
                   )}
                 </div>
 
                 {leadCard ? (
-                  <div className="mb-3 flex items-center justify-between gap-2 rounded-md border border-slate-800 bg-slate-950/70 px-2.5 py-2 text-xs">
-                    <span className="text-slate-400">Couleur demandee</span>
+                  <div className="mb-3 flex items-center justify-between gap-2 rounded-md border border-white/10 bg-black/45 px-2.5 py-2 text-xs">
+                    <span className="text-neutral-400">Couleur demandee</span>
                     <SuitBadge suit={leadCard.suit} />
                   </div>
                 ) : null}
 
-                <div className="rounded-lg border border-slate-800 bg-slate-950/65 p-2">
+                <div className="rounded-lg border border-white/10 bg-black/45 p-2">
                   <div className="flex items-stretch justify-center gap-2">
                     {round.moves.map((move) => {
                       const didWinMove = move.player === round.winner;
@@ -1034,21 +1035,21 @@ function TrickHistoryPanel({
                           className={`
                             relative flex min-w-0 flex-1 flex-col items-center gap-2 rounded-lg border px-2 py-2
                             ${didWinMove
-                              ? "border-amber-400/45 bg-amber-400/10"
-                              : "border-slate-800 bg-slate-900/70"}
+                              ? "border-yellow-300/45 bg-yellow-300/10"
+                              : "border-white/10 bg-[#151515]/70"}
                           `}
                         >
                           {didWinMove && (
-                            <div className="absolute -top-2 rounded-full border border-amber-300/50 bg-amber-400 px-1.5 py-0.5 text-[10px] font-black text-slate-950 shadow">
+                            <div className="absolute -top-2 rounded-full border border-yellow-200/60 bg-yellow-300 px-1.5 py-0.5 text-[10px] font-black text-black shadow">
                               Gagne
                             </div>
                           )}
                           <MiniCard card={move.card} isWinner={didWinMove} />
                           <div className="w-full min-w-0 text-center">
-                            <div className="truncate text-xs font-semibold text-slate-100">
+                            <div className="truncate text-xs font-semibold text-neutral-100">
                               {move.player === myName ? "Vous" : move.player}
                             </div>
-                            <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                            <div className="text-[10px] uppercase tracking-wide text-neutral-500">
                               {move.playOrder === 1 ? "Ouverture" : "Reponse"}
                             </div>
                           </div>
@@ -1057,7 +1058,7 @@ function TrickHistoryPanel({
                     })}
                   </div>
                   {round.moves.length === 1 && (
-                    <div className="mt-2 rounded-md border border-dashed border-slate-800 px-3 py-2 text-center text-xs text-slate-500">
+                    <div className="mt-2 rounded-md border border-dashed border-white/10 px-3 py-2 text-center text-xs text-neutral-500">
                       En attente de la deuxieme carte
                     </div>
                   )}
@@ -1111,7 +1112,7 @@ function MiniCard({ card, isWinner = false }: { card: ApiCard; isWinner?: boolea
     <div
       className={`
         relative h-20 w-14 shrink-0 overflow-hidden rounded-md border-2 bg-white shadow-lg shadow-black/30
-        ${isWinner ? "border-amber-300 ring-2 ring-amber-300/50" : "border-slate-200"}
+        ${isWinner ? "border-yellow-300 ring-2 ring-yellow-300/50" : "border-slate-200"}
       `}
     >
       <div className="absolute inset-0 rounded-md bg-gradient-to-br from-white via-slate-50 to-white" />

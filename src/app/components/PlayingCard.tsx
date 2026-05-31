@@ -13,6 +13,7 @@ interface PlayingCardProps {
   className?: string;
   size?: "sm" | "md" | "lg";
   faceDown?: boolean;
+  backSkin?: "classic" | "gold";
 }
 
 const suitSymbols = {
@@ -39,6 +40,7 @@ export function PlayingCard({
   className = "",
   size = "md",
   faceDown = false,
+  backSkin = "classic",
 }: PlayingCardProps) {
   const suitSymbol = suitSymbols[suit];
   const suitColor = suitColors[suit];
@@ -50,6 +52,20 @@ export function PlayingCard({
   };
 
   const currentSize = sizes[size];
+  const backStyle = {
+    classic: {
+      surface: "bg-gradient-to-br from-red-800 via-red-900 to-red-950 border-red-700",
+      pattern: "border-red-600",
+      symbol: "text-red-600",
+      glow: "from-red-500/20 via-transparent to-black/20",
+    },
+    gold: {
+      surface: "bg-gradient-to-br from-[#080808] via-violet-950 to-[#151515] border-yellow-300/65",
+      pattern: "border-yellow-300/60",
+      symbol: "text-yellow-200",
+      glow: "from-yellow-300/18 via-violet-400/10 to-black/40",
+    },
+  }[backSkin];
 
   if (faceDown) {
     return (
@@ -57,24 +73,27 @@ export function PlayingCard({
         whileHover={isPlayable ? { scale: 1.02 } : {}}
         className={`
           ${currentSize.container}
-          bg-gradient-to-br from-red-800 via-red-900 to-red-950
+          ${backStyle.surface}
           rounded-lg shadow-2xl relative overflow-hidden
-          border-2 border-red-700
+          border-2
           ${isPlayable ? "cursor-pointer" : ""}
           ${className}
         `}
       >
-        {/* Card back pattern */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${backStyle.glow}`} />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="grid grid-cols-3 grid-rows-3 gap-1 opacity-30">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="w-3 h-3 border-2 border-red-600 rounded-full" />
+              <div key={i} className={`w-3 h-3 rounded-full border-2 ${backStyle.pattern}`} />
             ))}
           </div>
         </div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-4xl text-red-600 opacity-40">♠</span>
+          <span className={`text-4xl opacity-45 ${backStyle.symbol}`}>♠</span>
         </div>
+        {backSkin === "gold" && (
+          <div className="absolute inset-2 rounded-md border border-yellow-200/25 shadow-inner shadow-yellow-200/10" />
+        )}
       </motion.div>
     );
   }
@@ -90,16 +109,16 @@ export function PlayingCard({
         ${currentSize.container}
         bg-white rounded-lg shadow-2xl relative overflow-hidden
         border-2
-        ${isPlayable ? "cursor-pointer border-gray-300 hover:shadow-amber-500/50 hover:border-amber-400 transition-all" : "cursor-not-allowed border-slate-400 opacity-45 grayscale saturate-50"}
-        ${isHighlighted ? "ring-2 ring-emerald-300/80 shadow-emerald-400/40" : ""}
-        ${isSelected ? "ring-4 ring-amber-400 shadow-amber-500/50 -translate-y-3" : ""}
+        ${isPlayable ? "cursor-pointer border-gray-300 hover:shadow-yellow-400/45 hover:border-yellow-300 transition-all" : "cursor-not-allowed border-slate-400 opacity-45 grayscale saturate-50"}
+        ${isHighlighted ? "ring-2 ring-violet-300/80 shadow-violet-400/40" : ""}
+        ${isSelected ? "ring-4 ring-yellow-300 shadow-yellow-400/45 -translate-y-3" : ""}
         ${className}
       `}
       style={{
         boxShadow: isSelected
-          ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 0 4px rgb(251 191 36)"
+          ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 0 4px rgb(253 224 71)"
           : isHighlighted
-            ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 24px rgba(110, 231, 183, 0.35)"
+            ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 24px rgba(168, 85, 247, 0.35)"
           : "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)"
       }}
     >

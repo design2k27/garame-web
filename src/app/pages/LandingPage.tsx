@@ -8,7 +8,7 @@ export function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="app-page">
       {/* Hero Section */}
       <div className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
         {/* Animated background cards */}
@@ -36,7 +36,7 @@ export function LandingPage() {
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center max-w-4xl"
         >
-          <h1 className="text-7xl font-bold mb-6 bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+          <h1 className="app-brand-text text-7xl font-bold mb-6">
             GARAME
           </h1>
           <p className="text-2xl text-slate-300 mb-12">
@@ -75,14 +75,14 @@ export function LandingPage() {
             </motion.div>
           </div>
 
-          <Button size="lg" onClick={() => navigate("/auth")} className="px-12">
+          <Button variant="app" size="lg" onClick={() => navigate("/auth")} className="px-12">
             Jouer Maintenant
           </Button>
         </motion.div>
       </div>
 
       {/* Features Section */}
-      <div className="py-24 px-4 bg-slate-900/50">
+      <div className="py-24 px-4 bg-black/25">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16 text-white">
             Pourquoi GARAME ?
@@ -118,7 +118,7 @@ export function LandingPage() {
           <h2 className="text-4xl font-bold text-center mb-12 text-white">
             Règles du Jeu
           </h2>
-          <div className="bg-slate-800/50 rounded-2xl p-8 space-y-6 text-slate-300">
+          <div className="app-card p-8 space-y-6 text-slate-300">
             <RuleItem
               number="1"
               text="2 joueurs, 5 cartes chacun. Paquet de 23 cartes (3-8, sans le 8♠)"
@@ -158,9 +158,9 @@ function FeatureCard({
   return (
     <motion.div
       whileHover={{ y: -8 }}
-      className="bg-slate-800/50 backdrop-blur p-6 rounded-xl border border-slate-700"
+      className="bg-[#151515]/88 backdrop-blur p-6 rounded-xl border border-white/10"
     >
-      <div className="text-amber-500 mb-4">{icon}</div>
+      <div className="text-violet-300 mb-4">{icon}</div>
       <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
       <p className="text-slate-400">{description}</p>
     </motion.div>
@@ -170,7 +170,7 @@ function FeatureCard({
 function RuleItem({ number, text }: { number: string; text: string }) {
   return (
     <div className="flex gap-4">
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center font-bold text-slate-900">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center font-bold text-white">
         {number}
       </div>
       <p className="pt-1">{text}</p>

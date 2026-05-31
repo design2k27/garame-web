@@ -53,13 +53,13 @@ export function Wallet() {
   const credits = summary?.credits ?? user?.credits ?? 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur">
+    <div className="app-page">
+      <header className="app-header">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/dashboard")}
-              className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
@@ -70,7 +70,7 @@ export function Wallet() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {error && (
-          <div className="mb-6 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-200">
+          <div className="app-danger-box mb-6">
             {error}
           </div>
         )}
@@ -82,30 +82,30 @@ export function Wallet() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-8 mb-8 shadow-2xl shadow-amber-950/30"
+              className="bg-gradient-to-r from-violet-600 via-purple-700 to-[#4b156d] rounded-2xl p-8 mb-8 shadow-2xl shadow-black/30 border border-violet-300/20"
             >
               <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <div className="text-amber-100 mb-2">Solde disponible</div>
+                  <div className="text-violet-100 mb-2">Solde disponible</div>
                   <div className="text-5xl font-bold text-white mb-2">{credits}</div>
-                  <div className="text-sm text-amber-50">credits de jeu</div>
+                  <div className="text-sm text-violet-50">credits de jeu</div>
                 </div>
                 <div className="rounded-xl border border-white/20 bg-white/10 p-4 text-sm text-white backdrop-blur">
                   <div className="flex items-center gap-2 font-bold">
                     <ShieldCheck className="h-4 w-4" />
                     Compte credits
                   </div>
-                  <div className="mt-1 text-amber-50">Depot/retrait reel non connecte au backend.</div>
+                  <div className="mt-1 text-violet-50">Depot/retrait reel non connecte au backend.</div>
                 </div>
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-                  <div className="text-amber-100 text-sm mb-1">Parties jouees</div>
+                  <div className="text-violet-100 text-sm mb-1">Parties jouees</div>
                   <div className="text-2xl font-bold text-white">{summary?.totalGames ?? 0}</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-                  <div className="text-amber-100 text-sm mb-1">Winrate</div>
+                  <div className="text-violet-100 text-sm mb-1">Winrate</div>
                   <div className="text-2xl font-bold text-white">{summary?.winRate ?? 0}%</div>
                 </div>
               </div>
@@ -149,21 +149,21 @@ export function Wallet() {
           </>
         )}
 
-        <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6 mb-8 flex gap-3">
-          <Info className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+        <div className="app-panel mb-8 flex gap-3 p-6">
+          <Info className="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-300">
             L'API actuelle gere un solde de credits de jeu. Les depots, retraits et transactions
             monetaires ne sont pas encore exposes par le backend.
           </div>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
+        <div className="app-panel p-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <h3 className="text-xl font-bold text-white">Derniers mouvements</h3>
               <p className="text-sm text-slate-400">Historique des gains et pertes de credits.</p>
             </div>
-            <WalletCards className="h-5 w-5 text-amber-400" />
+            <WalletCards className="h-5 w-5 text-violet-300" />
           </div>
           {stats?.recent.length ? (
             <div className="space-y-3">
@@ -178,7 +178,7 @@ export function Wallet() {
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-6 text-center">
+            <div className="rounded-xl border border-dashed border-violet-300/20 bg-violet-500/5 p-6 text-center">
               <div className="font-semibold text-white">Aucun mouvement</div>
               <div className="mt-1 text-sm text-slate-400">
                 Jouez une partie pour afficher vos gains et pertes ici.
@@ -188,7 +188,7 @@ export function Wallet() {
         </div>
 
         <div className="mt-6">
-          <Button className="w-full" onClick={() => navigate("/lobby")}>
+          <Button variant="app" className="w-full" onClick={() => navigate("/lobby")}>
             Jouer pour gagner des credits
           </Button>
         </div>
@@ -231,10 +231,10 @@ function WalletActionCard({
   status: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-800/50 p-5">
+    <div className="rounded-xl border border-white/10 bg-[#151515]/88 p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="rounded-lg bg-amber-500/10 p-2 text-amber-400">{icon}</div>
-        <span className="rounded-full border border-slate-700 bg-slate-950 px-2 py-1 text-xs font-semibold text-slate-400">
+        <div className="rounded-lg bg-violet-500/10 p-2 text-violet-200">{icon}</div>
+        <span className="rounded-full border border-white/10 bg-black/30 px-2 py-1 text-xs font-semibold text-slate-400">
           {status}
         </span>
       </div>
@@ -256,17 +256,17 @@ function TrustCard({
   status: string;
 }) {
   return (
-    <div className="rounded-xl border border-emerald-400/25 bg-emerald-400/10 p-5">
+    <div className="rounded-xl border border-violet-400/25 bg-violet-500/10 p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 font-bold text-emerald-100">
-          <span className="rounded-lg bg-emerald-300/10 p-2 text-emerald-200">{icon}</span>
+        <div className="flex items-center gap-2 font-bold text-violet-100">
+          <span className="rounded-lg bg-violet-300/10 p-2 text-violet-200">{icon}</span>
           {title}
         </div>
-        <span className="rounded-full border border-emerald-300/30 bg-slate-950/50 px-2 py-1 text-xs font-semibold text-emerald-100">
+        <span className="rounded-full border border-yellow-300/30 bg-black/30 px-2 py-1 text-xs font-semibold text-yellow-100">
           {status}
         </span>
       </div>
-      <div className="text-sm leading-relaxed text-emerald-50/80">{description}</div>
+      <div className="text-sm leading-relaxed text-violet-50/80">{description}</div>
     </div>
   );
 }
@@ -285,10 +285,10 @@ function Transaction({
   const isWin = type === "win";
 
   return (
-    <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg">
+    <div className="flex items-center justify-between p-3 bg-black/25 border border-white/5 rounded-lg">
       <div className="flex items-center gap-3">
         {isWin ? (
-          <ArrowDownLeft className="w-5 h-5 text-green-400" />
+          <ArrowDownLeft className="w-5 h-5 text-yellow-300" />
         ) : (
           <ArrowUpRight className="w-5 h-5 text-red-400" />
         )}
@@ -297,7 +297,7 @@ function Transaction({
           <div className="text-sm text-slate-500">{date}</div>
         </div>
       </div>
-      <div className={`font-bold ${isWin ? "text-green-400" : "text-red-400"}`}>
+      <div className={`font-bold ${isWin ? "text-yellow-300" : "text-rose-300"}`}>
         {amount > 0 ? "+" : ""}
         {amount} credits
       </div>

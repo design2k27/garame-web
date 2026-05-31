@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   children: ReactNode;
-  variant?: "primary" | "secondary" | "outline" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "danger" | "app" | "appSecondary" | "appOutline";
   size?: "sm" | "md" | "lg";
 }
 
@@ -22,6 +22,9 @@ export function Button({
     secondary: "bg-slate-700 text-white hover:bg-slate-600",
     outline: "border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-white",
     danger: "bg-red-600 text-white hover:bg-red-700",
+    app: "bg-gradient-to-r from-violet-500 to-purple-700 text-white shadow-lg shadow-violet-950/40 ring-1 ring-violet-300/30 hover:from-violet-400 hover:to-purple-600",
+    appSecondary: "border border-white/10 bg-white text-violet-900 shadow-lg shadow-black/20 hover:bg-violet-50",
+    appOutline: "border border-violet-300/35 bg-violet-500/10 text-violet-100 hover:bg-violet-500/18 hover:border-violet-200/50",
   };
 
   const sizes = {

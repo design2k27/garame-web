@@ -188,13 +188,13 @@ export function Lobby() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur">
+    <div className="app-page">
+      <header className="app-header">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/dashboard")}
-              className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
@@ -203,16 +203,16 @@ export function Lobby() {
               <p className="text-sm text-slate-400">Tables, matchmaking et mises indicatives</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg">
-            <Users className="w-5 h-5 text-green-400" />
+          <div className="flex items-center gap-2 rounded-lg border border-violet-400/25 bg-white/[0.04] px-4 py-2">
+            <Users className="w-5 h-5 text-violet-300" />
             <span className="text-white font-semibold">{onlineCount} actif(s)</span>
           </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-8">
         {error && (
-          <div className="mb-6 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-200">
+          <div className="app-danger-box mb-6">
             {error}
           </div>
         )}
@@ -224,11 +224,11 @@ export function Lobby() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/50 shadow-2xl shadow-black/20 backdrop-blur"
+              className="app-card mb-8 overflow-hidden"
             >
               <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
                 <div className="p-6 sm:p-8">
-                  <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-amber-300">
+                  <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-400/35 bg-violet-500/10 px-4 py-2 text-violet-200">
                     <Zap className="w-4 h-4" />
                     <span className="font-semibold">Match rapide</span>
                   </div>
@@ -253,20 +253,20 @@ export function Lobby() {
                           }}
                           className={`rounded-xl border p-4 text-left transition-all ${
                             selectedStake === stake
-                              ? "border-amber-400 bg-amber-500/15 shadow-lg shadow-amber-950/30"
-                              : "border-slate-700 bg-slate-900/55 hover:border-slate-500"
+                              ? "border-violet-400 bg-violet-500/15 shadow-lg shadow-violet-950/30"
+                              : "border-white/10 bg-black/25 hover:border-violet-300/40"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="text-2xl font-black text-white">{stake}</div>
                             {selectedStake === stake && (
-                              <div className="h-2.5 w-2.5 rounded-full bg-amber-400 shadow-lg shadow-amber-400/60" />
+                              <div className="h-2.5 w-2.5 rounded-full bg-yellow-300 shadow-lg shadow-yellow-300/60" />
                             )}
                           </div>
                           <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
                             credits
                           </div>
-                          <div className="mt-3 rounded-md border border-slate-700 bg-slate-950/60 px-2 py-1 text-xs text-slate-300">
+                          <div className="mt-3 rounded-md border border-white/10 bg-black/30 px-2 py-1 text-xs text-yellow-200">
                             Gain estim. {gain}
                           </div>
                         </motion.button>
@@ -275,22 +275,22 @@ export function Lobby() {
                   </div>
 
                   {needsStakeConfirmation && (
-                    <div className="mt-5 rounded-xl border border-amber-400/40 bg-amber-400/10 p-4">
-                      <div className="font-bold text-amber-100">Confirmer cette mise</div>
-                      <div className="mt-1 text-sm text-amber-50/80">
+                    <div className="mt-5 rounded-xl border border-yellow-300/35 bg-yellow-300/10 p-4">
+                      <div className="font-bold text-yellow-100">Confirmer cette mise</div>
+                      <div className="mt-1 text-sm text-yellow-50/80">
                         Cette table utilise la mise la plus haute disponible dans l'interface actuelle.
                         Verifiez votre solde et votre limite avant de continuer.
                       </div>
                     </div>
                   )}
 
-                  <Button size="lg" className="mt-7 w-full" onClick={handleQuickMatch}>
+                  <Button variant="app" size="lg" className="mt-7 w-full" onClick={handleQuickMatch}>
                     <Zap className="w-5 h-5 mr-2 inline" />
                     {needsStakeConfirmation ? "Confirmer et jouer" : "Jouer maintenant"}
                   </Button>
                 </div>
 
-                <div className="border-t border-slate-700 bg-slate-950/45 p-6 sm:p-8 lg:border-l lg:border-t-0">
+                <div className="border-t border-white/10 bg-black/25 p-6 sm:p-8 lg:border-l lg:border-t-0">
                   <div className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-400">
                     Resume de la table
                   </div>
@@ -300,10 +300,10 @@ export function Lobby() {
                     <EconomyRow icon={<ShieldCheck className="h-4 w-4" />} label="Frais estimes" value={`${estimatedFee} credits`} />
                     <EconomyRow icon={<Trophy className="h-4 w-4" />} label="Gain potentiel" value={`${estimatedGain} credits`} accent />
                   </div>
-                  <div className="mt-5 rounded-lg border border-slate-700 bg-slate-900/70 p-3 text-xs leading-relaxed text-slate-400">
+                  <div className="mt-5 rounded-lg border border-white/10 bg-[#151515] p-3 text-xs leading-relaxed text-neutral-400">
                     Les montants sont indicatifs tant que le backend wallet n'a pas de contrat de mise reel dedie.
                   </div>
-                  <div className="mt-3 rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-xs leading-relaxed text-emerald-100">
+                  <div className="mt-3 rounded-lg border border-violet-400/30 bg-violet-500/10 p-3 text-xs leading-relaxed text-violet-100">
                     Jeu responsable: ne misez que des credits que vous acceptez de perdre. Les limites de jeu
                     devront etre appliquees avant toute mise en argent reel.
                   </div>
@@ -311,7 +311,7 @@ export function Lobby() {
               </div>
             </motion.div>
 
-            <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-2xl p-8">
+            <div className="app-card p-8">
               <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-2xl font-bold text-white mb-1">Tables ouvertes</h3>
@@ -320,11 +320,11 @@ export function Lobby() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="secondary" onClick={() => refreshLobby()}>
+                  <Button variant="appOutline" onClick={() => refreshLobby()}>
                     <RefreshCw className="w-4 h-4 mr-2 inline" />
                     Actualiser
                   </Button>
-                  <Button variant="outline" onClick={handleCreateGame} disabled={isCreating}>
+                  <Button variant="appOutline" onClick={handleCreateGame} disabled={isCreating}>
                     <Lock className="w-4 h-4 mr-2 inline" />
                     {isCreating ? "Creation..." : "Creer"}
                   </Button>
@@ -333,8 +333,8 @@ export function Lobby() {
 
               <div className="space-y-3">
                 {openGames.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-8 text-center">
-                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-slate-300">
+                  <div className="rounded-xl border border-dashed border-violet-300/20 bg-violet-500/5 p-8 text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-violet-300/20 bg-black/30 text-violet-200">
                       <Users className="h-5 w-5" />
                     </div>
                     <div className="font-semibold text-white">Aucune table ouverte</div>
@@ -401,12 +401,12 @@ function EconomyRow({
   accent?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-700 bg-slate-900/75 px-3 py-3">
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-[#101010] px-3 py-3">
       <div className="flex min-w-0 items-center gap-2 text-slate-400">
-        <span className={accent ? "text-amber-300" : "text-slate-400"}>{icon}</span>
+        <span className={accent ? "text-yellow-300" : "text-violet-200"}>{icon}</span>
         <span className="truncate text-sm">{label}</span>
       </div>
-      <div className={`shrink-0 text-sm font-black ${accent ? "text-amber-300" : "text-white"}`}>
+      <div className={`shrink-0 text-sm font-black ${accent ? "text-yellow-300" : "text-white"}`}>
         {value}
       </div>
     </div>
@@ -424,9 +424,9 @@ function PrivateGameItem({
   const currentPlayers = game.players.length;
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-slate-700 bg-slate-900/55 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 rounded-xl border border-white/10 bg-[#101010] p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-amber-600 font-bold text-white">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-600 to-[#2a123f] font-bold text-white">
           {host[0]?.toUpperCase() ?? "J"}
         </div>
         <div className="min-w-0">
@@ -439,11 +439,11 @@ function PrivateGameItem({
         </div>
       </div>
       <div className="flex items-center justify-between gap-3 sm:justify-end">
-        <span className="flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-sm font-semibold text-amber-300">
+        <span className="flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-300/10 px-3 py-1 text-sm font-semibold text-yellow-200">
           <Clock className="w-4 h-4 animate-pulse" />
           En attente
         </span>
-        <Button size="sm" onClick={onJoin}>
+        <Button variant="app" size="sm" onClick={onJoin}>
           Rejoindre
         </Button>
       </div>
@@ -466,19 +466,19 @@ function MatchmakingScreen({
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="rounded-2xl border border-slate-700 bg-slate-800/50 p-8 text-center shadow-2xl shadow-black/20 backdrop-blur sm:p-12"
+      className="rounded-2xl border border-white/10 bg-[#151515]/88 p-8 text-center shadow-2xl shadow-black/30 backdrop-blur sm:p-12"
     >
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        className="w-20 h-20 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-6"
+        className="w-20 h-20 border-4 border-violet-500 border-t-transparent rounded-full mx-auto mb-6"
       />
       <h2 className="text-3xl font-bold text-white mb-2">Recherche d'adversaire...</h2>
       <p className="text-slate-400 mb-6">
         Mise indicative {stake} credits - gain potentiel {estimatedGain} credits
       </p>
       {queuedGame && (
-        <p className="mx-auto mb-6 w-fit rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-sm text-slate-400">
+        <p className="mx-auto mb-6 w-fit rounded-full border border-white/10 bg-black/30 px-3 py-1 text-sm text-slate-400">
           Table {queuedGame.id.slice(0, 8)}
         </p>
       )}
@@ -493,11 +493,11 @@ function MatchmakingScreen({
             key={delay}
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1, repeat: Infinity, delay }}
-            className="w-3 h-3 bg-amber-500 rounded-full"
+            className="w-3 h-3 bg-violet-500 rounded-full"
           />
         ))}
       </div>
-      <Button variant="outline" onClick={onCancel}>
+      <Button variant="appOutline" onClick={onCancel}>
         Annuler la recherche
       </Button>
     </motion.div>
@@ -509,11 +509,11 @@ function MatchmakingStep({ active, label }: { active: boolean; label: string }) 
     <div
       className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${
         active
-          ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
-          : "border-slate-700 bg-slate-900/65 text-slate-400"
+          ? "border-violet-400/40 bg-violet-500/10 text-violet-100"
+          : "border-white/10 bg-black/25 text-slate-400"
       }`}
     >
-      <div className={`h-2.5 w-2.5 rounded-full ${active ? "bg-emerald-300" : "bg-slate-600"}`} />
+      <div className={`h-2.5 w-2.5 rounded-full ${active ? "bg-yellow-300" : "bg-slate-600"}`} />
       <span>{label}</span>
     </div>
   );
